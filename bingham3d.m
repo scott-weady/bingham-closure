@@ -119,8 +119,7 @@ function ST = bingham3d(Q,T,c11,c12,c22)
     ts1111 = ts1111 + Tim2.*c11(1,j).*Tj + Tim1.*c11(2,j).*Tj;
     ts1122 = ts1122 + Tim2.*c12(1,j).*Tj + Tim1.*c12(2,j).*Tj;
     ts2222 = ts2222 + Tim2.*c22(1,j).*Tj + Tim1.*c22(2,j).*Tj;
-%     for i = 3:(M-(j-1))
-    for i = 3:M
+    for i = 3:(M-(j-1))
       Ti = 2*nu1.*Tim1 - Tim2;
       ts1111 = ts1111 + Ti.*c11(i,j).*Tj;
       ts1122 = ts1122 + Ti.*c12(i,j).*Tj;
@@ -135,8 +134,6 @@ function ST = bingham3d(Q,T,c11,c12,c22)
   ts1133 = mu1 - ts1111 - ts1122;
   ts2233 = mu2 - ts1122 - ts2222;
   ts3333 = mu3 - ts1133 - ts2233;
-
-  disp(abs([ts1111(1) ts1122(1) ts2222(1)]-[1/5 1/15 1/5]))
 
   % Rotate T to diagonal coordinate system
   tt11 = O11.*(t11.*O11 + 2*t12.*O21 + 2*t13.*O31) + ...
