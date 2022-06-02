@@ -2,8 +2,9 @@
 % Nematic Bingham closure in two dimensions
 %
 % Input:
-%   Q - second moment tensor, struct with fields q11,q12,q22
+%   Q - normalized second moment tensor, struct with fields q11,q12,q22
 %   T - rotation tensor T = E + 2*zeta*c*Q, struct with fields t11,t12,t22
+%   M - degree of Chebyshev interpolant (max 100)
 %   cs1111 - Chebyshev coefficients mu1 --> ts1111
 %
 % Output:
@@ -12,7 +13,7 @@
 % Scott Weady, CIMS
 % Last updated February 2022
 %-------------------------------------------------------------------------------
-function ST = bingham2d(Q,T,cs1111)
+function ST = bingham2d(Q,T,M,cs1111)
 
   % Get components
   q11 = Q.q11; q12 = Q.q12+1e-15; %second moment tensor
@@ -26,12 +27,12 @@ function ST = bingham2d(Q,T,cs1111)
   O21 = -O12; O22 = O11;       
 
   % Evaluate Chebyshev interpolant
-  M = length(cs1111);
   nu = 4*mu1 - 3;
   Tnm1 = 1; Tn = nu;
   ts1111 = cs1111(2)*Tn + cs1111(1)*Tnm1;            
 
-  for k = 3:M
+  M = min(M,100);
+  for k = 3:(M+1)
     Tnp1 = 2*nu.*Tn - Tnm1;
     ts1111 = ts1111 + cs1111(k)*Tnp1;
     Tnm1 = Tn; Tn = Tnp1;
