@@ -2,8 +2,9 @@
 % Nematic Bingham closure in three dimensions
 %
 % Input:
-%   Q - second moment tensor, struct with fields q11,q12,q13,q22,q23,q33
+%   Q - normalized second moment tensor, struct with fields q11,q12,q13,q22,q23,q33
 %   T - rotation tensor T = E + 2*zeta*c*Q, struct with fields t11,t12,t13,t22,t23,t33
+%   M - degree of Chebyshev interpolants
 %   c11 - Chebyshev coefficients (nu1,nu2) --> ts1111
 %   c12 - Chebyshev coefficients (nu1,nu2) --> ts1122
 %   c22 - Chebyshev coefficients (nu1,nu2) --> ts2222
@@ -11,10 +12,14 @@
 % Output:
 %   ST - contraction S:T, struct with fields st11,st12,st13,st22,st23,st33
 %
-% Scott Weady, CIMS
-% Last updated February 2022
+%
+% Reference:
+%  [1] Weady et al., Journal of Computational Physics (2022).
+%
+% Scott Weady, Courant Institute
+% Contact: scott (dot) weady (at) nyu (dot) edu
 %-------------------------------------------------------------------------------
-function ST = bingham3d(Q,T,c11,c12,c22)
+function ST = bingham3d(Q,T,M,c11,c12,c22)
       
   % Get components of second moment tensor
   q11 = Q.q11; q12 = Q.q12+1e-15; q13 = Q.q13+1e-15;
@@ -102,8 +107,8 @@ function ST = bingham3d(Q,T,c11,c12,c22)
   ts2222 = Tim2.*(c22(1,1).*Tjm2 + c22(1,2).*Tjm1) + ...
            Tim1.*(c22(2,1).*Tjm2 + c22(2,2).*Tjm1);
          
-  M = length(c11);
-  for i = 3:M
+  M = min(M,100);
+  for i = 3:(M+1)
     Ti = 2*nu1.*Tim1 - Tim2;
     ts1111 = ts1111 + Ti.*(c11(i,1).*Tjm2 + c11(i,2).*Tjm1);
     ts1122 = ts1122 + Ti.*(c12(i,1).*Tjm2 + c12(i,2).*Tjm1);
@@ -112,14 +117,14 @@ function ST = bingham3d(Q,T,c11,c12,c22)
     Tim1 = Ti;
   end
 
-  for j = 3:M
+  for j = 3:(M+1)
     Tj = 2*nu2.*Tjm1 - Tjm2;
     Tim2 = 1;
     Tim1 = nu1;
     ts1111 = ts1111 + Tim2.*c11(1,j).*Tj + Tim1.*c11(2,j).*Tj;
     ts1122 = ts1122 + Tim2.*c12(1,j).*Tj + Tim1.*c12(2,j).*Tj;
     ts2222 = ts2222 + Tim2.*c22(1,j).*Tj + Tim1.*c22(2,j).*Tj;
-    for i = 3:(M-(j-1))
+    for i = 3:(M-j)
       Ti = 2*nu1.*Tim1 - Tim2;
       ts1111 = ts1111 + Ti.*c11(i,j).*Tj;
       ts1122 = ts1122 + Ti.*c12(i,j).*Tj;
