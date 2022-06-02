@@ -10,8 +10,12 @@
 % Output:
 %   ST - contraction S:T, struct with fields st11,st12,st22
 %
-% Scott Weady, CIMS
-% Last updated February 2022
+%
+% Reference:
+%  [1] Weady et al., Journal of Computational Physics (2022).
+%
+% Scott Weady, Courant Institute
+% Contact: scott (dot) weady (at) nyu (dot) edu
 %-------------------------------------------------------------------------------
 function ST = bingham2d(Q,T,M,cs1111)
 
